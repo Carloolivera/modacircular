@@ -130,3 +130,113 @@ User::create(['name' => 'Admin', 'email' => 'admin@ejemplo.com', 'password' => b
 - Los productos se ocultan automáticamente cuando el stock llega a 0
 - Las imágenes se suben a `storage/app/public/products`
 - Filament usa Tailwind CSS y Livewire
+
+---
+
+## 🛍️ Catálogo Público
+
+El sitio público incluye:
+
+### ✅ Página Principal (/)
+- Hero section con llamado a la acción
+- Categorías disponibles
+- Productos destacados
+- Links rápidos a productos
+
+### ✅ Listado de Productos (/productos)
+- Grid responsivo de productos
+- Filtros por categoría
+- Búsqueda de productos
+- Ordenamiento (más nuevos, precio, nombre)
+- Paginación
+
+### ✅ Detalle de Producto (/producto/{slug})
+- Galería de imágenes con thumbnails
+- Información completa (precio, stock, talle, color)
+- Cantidad ajustable
+- Productos relacionados
+- Botón para agregar al carrito
+
+### ✅ Vista por Categoría (/categoria/{slug})
+- Productos filtrados por categoría
+- Grid responsivo
+- Paginación
+
+---
+
+## 🛒 Carrito de Compras
+
+### ✅ Funcionalidades del Carrito
+- Agregar productos desde cualquier vista
+- Ajustar cantidades
+- Eliminar productos
+- Persistencia en sesión
+- Validación de stock en tiempo real
+- Contador en navegación
+
+### ✅ Proceso de Checkout
+1. Datos del cliente (nombre, teléfono)
+2. Método de envío:
+   - Envío en moto (requiere dirección)
+   - Retiro en persona
+3. Método de pago:
+   - Mercado Pago
+   - Transferencia bancaria
+   - Efectivo
+4. Notas adicionales (opcional)
+
+### ✅ Integración WhatsApp
+- Mensaje formateado automáticamente con:
+  * Datos del cliente
+  * Lista de productos con cantidades y precios
+  * Total del pedido
+  * Método de envío y dirección
+  * Método de pago
+  * Notas adicionales
+- Redirección automática a WhatsApp Web
+- Carrito se vacía después del envío
+
+---
+
+## 🎨 Diseño y UX
+
+- **Framework CSS**: Tailwind CSS
+- **JavaScript**: Alpine.js para interactividad
+- **Diseño**: Responsive (mobile-first)
+- **Componentes**: Cards, grids, forms, buttons
+- **Navegación**: Fixed header con contador de carrito
+- **Mensajes**: Flash messages para feedback
+- **Colores**: Esquema indigo/purple profesional
+
+---
+
+## 📱 Flujo de Usuario
+
+1. **Explorar** → Usuario entra al sitio y ve productos destacados
+2. **Navegar** → Explora categorías o busca productos
+3. **Seleccionar** → Ve detalles del producto
+4. **Agregar** → Añade productos al carrito
+5. **Revisar** → Verifica el carrito
+6. **Checkout** → Completa formulario con datos
+7. **WhatsApp** → Envía pedido por WhatsApp
+8. **Confirmar** → Vendedor confirma por WhatsApp
+
+---
+
+## 🚀 Todo está listo!
+
+El sistema está **100% funcional** y listo para usar:
+
+✅ Panel admin completo con Filament  
+✅ Catálogo público con filtros y búsqueda  
+✅ Carrito de compras con validación de stock  
+✅ Integración WhatsApp para pedidos  
+✅ Base de datos con datos de ejemplo  
+✅ Diseño responsivo profesional  
+
+**Solo necesitas:**
+1. Hacer pull del repositorio
+2. Levantar Docker
+3. Compilar assets
+4. ¡Empezar a vender!
+
