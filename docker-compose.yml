@@ -64,17 +64,19 @@ services:
 
   # Servicio de phpMyAdmin
   phpmyadmin:
-    image: phpmyadmin/phpmyadmin
+    image: phpmyadmin/phpmyadmin:latest
     container_name: modacircular-phpmyadmin
     restart: unless-stopped
     ports:
-      - "8080:80"
+      - "8081:80"
     environment:
       PMA_HOST: db
       PMA_PORT: 3306
-      PMA_USER: root
-      PMA_PASSWORD: root
+      PMA_ARBITRARY: 1
+      MYSQL_ROOT_PASSWORD: root
       UPLOAD_LIMIT: 50M
+      MEMORY_LIMIT: 512M
+      MAX_EXECUTION_TIME: 300
     networks:
       - modacircular-network
     depends_on:

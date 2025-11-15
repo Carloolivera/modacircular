@@ -4,7 +4,7 @@
 
 - Docker instalado
 - Docker Compose instalado
-- Puerto 8000, 8080 y 3306 disponibles
+- Puerto 8000, 8081 y 3306 disponibles
 
 ## 🚀 Inicio Rápido
 
@@ -39,7 +39,7 @@ Deberías ver:
 ✅ ¡ModaCircular iniciado correctamente!
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🌐 Web: http://localhost:8000
-🗄️  phpMyAdmin: http://localhost:8080
+🗄️  phpMyAdmin: http://localhost:8081
 👤 Admin: admin@modacircular.com / admin123
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
@@ -49,7 +49,7 @@ Deberías ver:
 | Servicio | URL | Credenciales |
 |----------|-----|--------------|
 | **Aplicación Web** | http://localhost:8000 | - |
-| **phpMyAdmin** | http://localhost:8080 | Usuario: `root` / Contraseña: `root` |
+| **phpMyAdmin** | http://localhost:8081 | Usuario: `root` / Contraseña: `root` |
 | **MySQL** | localhost:3306 | Usuario: `modacircular` / Contraseña: `password` |
 | **Admin Panel** | http://localhost:8000/login | admin@modacircular.com / admin123 |
 
@@ -193,7 +193,7 @@ docker compose exec app php artisan migrate:fresh --seed
 └────────┬────────┘
          │
 ┌────────▼────────┐
-│   phpmyadmin    │ (phpMyAdmin - Puerto 8080)
+│   phpmyadmin    │ (phpMyAdmin - Puerto 8081)
 │   phpmyadmin    │
 └─────────────────┘
 ```
