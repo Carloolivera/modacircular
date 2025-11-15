@@ -4,10 +4,26 @@ set -e
 
 echo "🚀 Iniciando ModaCircular..."
 
+# Mostrar información de conexión para debug
+echo "📊 Configuración de base de datos:"
+echo "   Host: ${DB_HOST}"
+echo "   Puerto: ${DB_PORT}"
+echo "   Base de datos: ${DB_DATABASE}"
+echo "   Usuario: ${DB_USERNAME}"
+
 # Esperar a que MySQL esté listo
 echo "⏳ Esperando a que MySQL esté listo..."
+MAX_RETRIES=30
+RETRY_COUNT=0
+
 until mysql -h"${DB_HOST}" -u"${DB_USERNAME}" -p"${DB_PASSWORD}" "${DB_DATABASE}" -e "SELECT 1" > /dev/null 2>&1; do
-    echo "⏳ MySQL no está listo todavía, reintentando en 3 segundos..."
+    RETRY_COUNT=$((RETRY_COUNT+1))
+    if [ $RETRY_COUNT -ge $MAX_RETRIES ]; then
+        echo "❌ Error: MySQL no respondió después de $MAX_RETRIES intentos"
+        echo "   Verifica que el contenedor de MySQL esté corriendo correctamente"
+        exit 1
+    fi
+    echo "⏳ MySQL no está listo todavía (intento $RETRY_COUNT/$MAX_RETRIES), reintentando en 3 segundos..."
     sleep 3
 done
 
