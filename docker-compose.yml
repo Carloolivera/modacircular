@@ -1,12 +1,12 @@
 version: '3.8'
 
 services:
-  # Servicio de aplicación Laravel
+  # Servicio de aplicación Laravel (PHP-FPM)
   app:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: modacircular
+    container_name: modacircular-app
     restart: unless-stopped
     working_dir: /var/www
     volumes:
@@ -32,7 +32,7 @@ services:
     depends_on:
       - app
 
-  # Servicio de MySQL
+  # Servicio de MySQL 8
   db:
     image: mysql:8.0
     container_name: modacircular-db
@@ -43,9 +43,26 @@ services:
       MYSQL_PASSWORD: password
       MYSQL_USER: modacircular
     ports:
-      - "3306:3306"
+      - "3305:3306"
     volumes:
       - mysql-data:/var/lib/mysql
+    networks:
+      - modacircular-network
+
+  # Servicio phpMyAdmin
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: modacircular-phpmyadmin
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: db
+      PMA_USER: root
+      PMA_PASSWORD: root
+      UPLOAD_LIMIT: 300M
+    depends_on:
+      - db
     networks:
       - modacircular-network
 
