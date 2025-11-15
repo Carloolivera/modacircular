@@ -1,37 +1,6 @@
 version: '3.8'
 
 services:
-  # Servicio de aplicación Laravel
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: modacircular
-    restart: unless-stopped
-    working_dir: /var/www
-    volumes:
-      - ./:/var/www
-      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
-    networks:
-      - modacircular-network
-    depends_on:
-      - db
-
-  # Servicio de Nginx
-  webserver:
-    image: nginx:alpine
-    container_name: modacircular-webserver
-    restart: unless-stopped
-    ports:
-      - "8000:80"
-    volumes:
-      - ./:/var/www
-      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
-    networks:
-      - modacircular-network
-    depends_on:
-      - app
-
   # Servicio de MySQL
   db:
     image: mysql:8.0
@@ -48,6 +17,50 @@ services:
       - mysql-data:/var/lib/mysql
     networks:
       - modacircular-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # Servicio de aplicación Laravel
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: modacircular
+    restart: unless-stopped
+    working_dir: /var/www
+    environment:
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: modacircular
+      DB_USERNAME: modacircular
+      DB_PASSWORD: password
+    volumes:
+      - ./:/var/www
+      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    networks:
+      - modacircular-network
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # Servicio de Nginx
+  webserver:
+    image: nginx:alpine
+    container_name: modacircular-webserver
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - ./:/var/www
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - modacircular-network
+    depends_on:
+      - app
 
   # Servicio de phpMyAdmin
   phpmyadmin:
@@ -59,11 +72,14 @@ services:
     environment:
       PMA_HOST: db
       PMA_PORT: 3306
-      MYSQL_ROOT_PASSWORD: root
+      PMA_USER: root
+      PMA_PASSWORD: root
+      UPLOAD_LIMIT: 50M
     networks:
       - modacircular-network
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
 networks:
   modacircular-network:

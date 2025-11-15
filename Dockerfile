@@ -14,6 +14,7 @@ RUN apt-get update && apt-get install -y \
     zip \
     unzip \
     libzip-dev \
+    default-mysql-client \
     nodejs \
     npm
 
@@ -35,11 +36,15 @@ RUN mkdir -p /home/$user/.composer && \
 WORKDIR /var/www
 
 # Copiar archivos de la aplicación
-COPY --chown=$user:$user . /var/www
+COPY --chown=www-data:www-data . /var/www
 
-# Cambiar al usuario creado
-USER $user
+# Copiar script de entrypoint
+COPY docker/app/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
-# Exponer puerto 9000 y arrancar servidor php-fpm
+# Exponer puerto 9000
 EXPOSE 9000
+
+# Usar entrypoint personalizado
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 CMD ["php-fpm"]
