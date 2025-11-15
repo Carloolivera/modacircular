@@ -1,28 +1,6 @@
 version: '3.8'
 
 services:
-  # Servicio de MySQL
-  db:
-    image: mysql:8.0
-    container_name: modacircular-db
-    restart: unless-stopped
-    environment:
-      MYSQL_DATABASE: modacircular
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_PASSWORD: password
-      MYSQL_USER: modacircular
-    ports:
-      - "3306:3306"
-    volumes:
-      - mysql-data:/var/lib/mysql
-    networks:
-      - modacircular-network
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-
   # Servicio de aplicación Laravel
   app:
     build:
@@ -31,21 +9,13 @@ services:
     container_name: modacircular
     restart: unless-stopped
     working_dir: /var/www
-    environment:
-      DB_CONNECTION: mysql
-      DB_HOST: db
-      DB_PORT: 3306
-      DB_DATABASE: modacircular
-      DB_USERNAME: modacircular
-      DB_PASSWORD: password
     volumes:
       - ./:/var/www
       - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
     networks:
       - modacircular-network
     depends_on:
-      db:
-        condition: service_healthy
+      - db
 
   # Servicio de Nginx
   webserver:
@@ -62,26 +32,22 @@ services:
     depends_on:
       - app
 
-  # Servicio de phpMyAdmin
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin:latest
-    container_name: modacircular-phpmyadmin
+  # Servicio de MySQL
+  db:
+    image: mysql:8.0
+    container_name: modacircular-db
     restart: unless-stopped
-    ports:
-      - "8081:80"
     environment:
-      PMA_HOST: db
-      PMA_PORT: 3306
-      PMA_ARBITRARY: 1
+      MYSQL_DATABASE: modacircular
       MYSQL_ROOT_PASSWORD: root
-      UPLOAD_LIMIT: 50M
-      MEMORY_LIMIT: 512M
-      MAX_EXECUTION_TIME: 300
+      MYSQL_PASSWORD: password
+      MYSQL_USER: modacircular
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
     networks:
       - modacircular-network
-    depends_on:
-      db:
-        condition: service_healthy
 
 networks:
   modacircular-network:
