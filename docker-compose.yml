@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  # Servicio de aplicación Laravel
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: modacircular
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./:/var/www
+      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    networks:
+      - modacircular-network
+    depends_on:
+      - db
+
+  # Servicio de Nginx
+  webserver:
+    image: nginx:alpine
+    container_name: modacircular-webserver
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - ./:/var/www
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - modacircular-network
+    depends_on:
+      - app
+
+  # Servicio de MySQL
+  db:
+    image: mysql:8.0
+    container_name: modacircular-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: modacircular
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_PASSWORD: password
+      MYSQL_USER: modacircular
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - modacircular-network
+
+networks:
+  modacircular-network:
+    driver: bridge
+
+volumes:
+  mysql-data:
+    driver: local
