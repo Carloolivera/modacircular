@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(docker logs:*)",
+      "Bash(docker-compose down:*)",
+      "Bash(docker-compose up:*)",
+      "Bash(docker exec:*)",
+      "Bash(docker-compose build:*)",
+      "Bash(docker stop:*)",
+      "Bash(docker start:*)",
+      "Bash(docker restart:*)",
+      "Bash(curl -I http://localhost:8000)",
+      "Bash(curl:*)",
+      "Bash(timeout 120 curl:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
