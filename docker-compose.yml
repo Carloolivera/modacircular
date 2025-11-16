@@ -22,7 +22,14 @@ services:
     networks:
       - modacircular-network
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+    environment:
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=modacircular
+      - DB_USERNAME=modacircular
+      - DB_PASSWORD=password
 
   # Servicio de Nginx
   webserver:
@@ -44,6 +51,7 @@ services:
     image: mysql:8.0
     container_name: modacircular-db
     restart: unless-stopped
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     environment:
       MYSQL_DATABASE: modacircular
       MYSQL_ROOT_PASSWORD: root
@@ -55,6 +63,12 @@ services:
       - mysql-data:/var/lib/mysql
     networks:
       - modacircular-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
 
   # Servicio phpMyAdmin
   phpmyadmin:

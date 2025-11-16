@@ -40,6 +40,15 @@ class Category extends Model
                 $category->slug = Str::slug($category->name);
             }
         });
+
+        // Limpiar cache cuando se modifica una categoría
+        static::saved(function ($category) {
+            cache()->forget('active_categories');
+        });
+
+        static::deleted(function ($category) {
+            cache()->forget('active_categories');
+        });
     }
 
     /**

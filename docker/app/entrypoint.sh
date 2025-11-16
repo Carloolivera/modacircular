@@ -4,6 +4,13 @@ set -e
 
 echo "🚀 Iniciando ModaCircular..."
 
+# Mostrar información de conexión para debug
+echo "📊 Configuración de base de datos:"
+echo "   Host: ${DB_HOST}"
+echo "   Puerto: ${DB_PORT}"
+echo "   Base de datos: ${DB_DATABASE}"
+echo "   Usuario: ${DB_USERNAME}"
+
 # Esperar a que MySQL esté listo
 echo "⏳ Esperando a que MySQL esté listo..."
 until mysql -h"${DB_HOST}" -u"${DB_USERNAME}" -p"${DB_PASSWORD}" "${DB_DATABASE}" --skip-ssl -e "SELECT 1" > /dev/null 2>&1; do

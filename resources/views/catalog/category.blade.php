@@ -15,7 +15,7 @@
         <div class="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition">
             <a href="{{ route('products.show', $product->slug) }}">
                 @if($product->primaryImage)
-                <img src="{{ Storage::url($product->primaryImage->path) }}" alt="{{ $product->name }}" class="w-full h-64 object-cover">
+                <img src="{{ Storage::url($product->primaryImage->path) }}" alt="{{ $product->name }}" class="w-full h-64 object-cover" loading="lazy">
                 @else
                 <div class="w-full h-64 bg-gray-200 flex items-center justify-center">
                     <span class="text-gray-400">Sin imagen</span>
