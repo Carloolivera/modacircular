@@ -25,7 +25,7 @@
             @if($product->images->count() > 1)
             <div class="grid grid-cols-4 gap-2">
                 @foreach($product->images as $image)
-                <img src="{{ Storage::url($image->path) }}" alt="{{ $product->name }}" class="w-full h-24 object-cover rounded cursor-pointer hover:opacity-75" onclick="document.getElementById('mainImage').src='{{ Storage::url($image->path) }}'">
+                <img src="{{ Storage::url($image->path) }}" alt="{{ $product->name }}" class="w-full h-24 object-cover rounded cursor-pointer hover:opacity-75" loading="lazy" onclick="document.getElementById('mainImage').src='{{ Storage::url($image->path) }}'">
                 @endforeach
             </div>
             @endif
@@ -101,7 +101,7 @@
             <div class="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition">
                 <a href="{{ route('products.show', $relatedProduct->slug) }}">
                     @if($relatedProduct->primaryImage)
-                    <img src="{{ Storage::url($relatedProduct->primaryImage->path) }}" alt="{{ $relatedProduct->name }}" class="w-full h-48 object-cover">
+                    <img src="{{ Storage::url($relatedProduct->primaryImage->path) }}" alt="{{ $relatedProduct->name }}" class="w-full h-48 object-cover" loading="lazy">
                     @else
                     <div class="w-full h-48 bg-gray-200 flex items-center justify-center">
                         <span class="text-gray-400 text-sm">Sin imagen</span>

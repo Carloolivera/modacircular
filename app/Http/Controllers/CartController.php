@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Setting;
+use App\Models\Order;
+use App\Models\OrderItem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CartController extends Controller
 {
@@ -151,19 +154,84 @@ class CartController extends Controller
             return redirect()->route('cart.index')->with('error', 'El carrito está vacío');
         }
 
-        // Construir mensaje
-        $message = $this->buildWhatsAppMessage($cart, $request);
+        // Crear el pedido en la base de datos
+        try {
+            DB::beginTransaction();
 
-        // Número de WhatsApp
-        $whatsappNumber = Setting::get('whatsapp_number', '5491112345678');
+            // Calcular totales
+            $subtotal = $this->calculateTotal($cart);
+            $shippingCost = $request->shipping_method === 'moto' ? 0 : 0; // Aquí puedes agregar costos de envío
+            $total = $subtotal + $shippingCost;
 
-        // URL de WhatsApp
-        $whatsappUrl = "https://wa.me/{$whatsappNumber}?text=" . urlencode($message);
+            // Crear el pedido
+            $order = Order::create([
+                'customer_name' => $request->name,
+                'customer_phone' => $request->phone,
+                'customer_email' => $request->email ?? null,
+                'subtotal' => $subtotal,
+                'shipping_cost' => $shippingCost,
+                'total' => $total,
+                'status' => 'pending',
+                'shipping_method' => $request->shipping_method,
+                'shipping_address' => $request->address ?? null,
+                'payment_method' => $request->payment_method,
+                'payment_status' => 'pending',
+                'notes' => $request->notes ?? null,
+            ]);
 
-        // Limpiar carrito
-        session()->forget('cart');
+            // Crear los items del pedido y actualizar stock
+            foreach ($cart as $item) {
+                $product = Product::find($item['id']);
 
-        return redirect()->away($whatsappUrl);
+                if (!$product) {
+                    throw new \Exception("Producto {$item['name']} no encontrado");
+                }
+
+                // Verificar stock disponible
+                if ($product->stock < $item['quantity']) {
+                    throw new \Exception("Stock insuficiente para {$item['name']}");
+                }
+
+                // Crear el item del pedido
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'product_id' => $product->id,
+                    'product_name' => $item['name'],
+                    'product_size' => $item['size'] ?? null,
+                    'product_color' => $item['color'] ?? null,
+                    'price' => $item['price'],
+                    'quantity' => $item['quantity'],
+                    'subtotal' => $item['price'] * $item['quantity'],
+                    'product_image' => $item['image'] ?? null,
+                ]);
+
+                // Descontar del stock
+                $product->decrement('stock', $item['quantity']);
+            }
+
+            DB::commit();
+
+            // Construir mensaje con el número de orden
+            $message = $this->buildWhatsAppMessage($cart, $request, $order->order_number);
+
+            // Número de WhatsApp
+            $whatsappNumber = Setting::get('whatsapp_number', '5491112345678');
+
+            // URL de WhatsApp
+            $whatsappUrl = "https://wa.me/{$whatsappNumber}?text=" . urlencode($message);
+
+            // Limpiar carrito
+            session()->forget('cart');
+
+            // Guardar el ID de la última orden en sesión (para mostrar confirmación)
+            session()->flash('last_order_id', $order->id);
+
+            return redirect()->away($whatsappUrl);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Error al procesar el pedido: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -181,9 +249,14 @@ class CartController extends Controller
     /**
      * Construir mensaje de WhatsApp
      */
-    private function buildWhatsAppMessage($cart, $request)
+    private function buildWhatsAppMessage($cart, $request, $orderNumber = null)
     {
         $message = "🛍️ *NUEVO PEDIDO - Moda Circular*\n\n";
+
+        if ($orderNumber) {
+            $message .= "📋 *Pedido #:* {$orderNumber}\n";
+        }
+
         $message .= "👤 *Cliente:* {$request->name}\n";
         $message .= "📱 *Teléfono:* {$request->phone}\n\n";
 

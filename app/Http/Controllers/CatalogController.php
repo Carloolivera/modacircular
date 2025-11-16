@@ -13,15 +13,21 @@ class CatalogController extends Controller
      */
     public function index()
     {
-        $featuredProducts = Product::with(['category', 'primaryImage'])
-            ->featured()
-            ->take(8)
-            ->get();
+        // Cache de productos destacados por 10 minutos
+        $featuredProducts = cache()->remember('featured_products', 600, function () {
+            return Product::with(['category', 'primaryImage'])
+                ->featured()
+                ->take(8)
+                ->get();
+        });
 
-        $categories = Category::where('is_active', true)
-            ->withCount(['activeProducts'])
-            ->having('active_products_count', '>', 0)
-            ->get();
+        // Cache de categorías activas por 10 minutos
+        $categories = cache()->remember('active_categories', 600, function () {
+            return Category::where('is_active', true)
+                ->withCount(['activeProducts'])
+                ->having('active_products_count', '>', 0)
+                ->get();
+        });
 
         return view('catalog.index', compact('featuredProducts', 'categories'));
     }
@@ -64,10 +70,13 @@ class CatalogController extends Controller
 
         $products = $query->paginate(12);
 
-        $categories = Category::where('is_active', true)
-            ->withCount(['activeProducts'])
-            ->having('active_products_count', '>', 0)
-            ->get();
+        // Cache de categorías activas
+        $categories = cache()->remember('active_categories', 600, function () {
+            return Category::where('is_active', true)
+                ->withCount(['activeProducts'])
+                ->having('active_products_count', '>', 0)
+                ->get();
+        });
 
         return view('catalog.products', compact('products', 'categories'));
     }
@@ -109,10 +118,13 @@ class CatalogController extends Controller
             ->where('category_id', $category->id)
             ->paginate(12);
 
-        $categories = Category::where('is_active', true)
-            ->withCount(['activeProducts'])
-            ->having('active_products_count', '>', 0)
-            ->get();
+        // Cache de categorías activas
+        $categories = cache()->remember('active_categories', 600, function () {
+            return Category::where('is_active', true)
+                ->withCount(['activeProducts'])
+                ->having('active_products_count', '>', 0)
+                ->get();
+        });
 
         return view('catalog.category', compact('category', 'products', 'categories'));
     }
