@@ -1,7 +1,6 @@
 version: '3.8'
 
 services:
-  # Servicio de aplicación Laravel (PHP-FPM)
   app:
     build:
       context: .
@@ -24,14 +23,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    environment:
-      - DB_HOST=db
-      - DB_PORT=3306
-      - DB_DATABASE=modacircular
-      - DB_USERNAME=modacircular
-      - DB_PASSWORD=password
 
-  # Servicio de Nginx
   webserver:
     image: nginx:alpine
     container_name: modacircular-webserver
@@ -46,7 +38,6 @@ services:
     depends_on:
       - app
 
-  # Servicio de MySQL 8
   db:
     image: mysql:8.0
     container_name: modacircular-db
@@ -70,7 +61,6 @@ services:
       retries: 20
       start_period: 30s
 
-  # Servicio phpMyAdmin
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest
     container_name: modacircular-phpmyadmin
