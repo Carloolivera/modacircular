@@ -65,5 +65,8 @@ echo "👤 Admin: admin@modacircular.com / admin123"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 
+# Al final, antes de exec
+echo "🚀 Iniciando PHP-FPM..."
+
 # Iniciar PHP-FPM
 exec docker-php-entrypoint "$@"
